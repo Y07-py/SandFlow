@@ -10,13 +10,16 @@ import AppKit
 
 struct RootContainerRepresentable<Sidebar: View, MainContent: View>: NSViewControllerRepresentable {
 
+    private let isSidebarOpen: Bool
     private let sidebar: Sidebar
     private let mainContent: MainContent
 
     init(
+        isSidebarOpen: Bool,
         @ViewBuilder sidebar: () -> Sidebar,
         @ViewBuilder mainContent: () -> MainContent
     ) {
+        self.isSidebarOpen = isSidebarOpen
         self.sidebar = sidebar()
         self.mainContent = mainContent()
     }
@@ -35,5 +38,6 @@ struct RootContainerRepresentable<Sidebar: View, MainContent: View>: NSViewContr
     func updateNSViewController(_ nsViewController: RootContainerViewController, context: Context) {
         (nsViewController.sidebarHostingView as? NSHostingView<Sidebar>)?.rootView = sidebar
         (nsViewController.mainContentHostingView as? NSHostingView<MainContent>)?.rootView = mainContent
+        nsViewController.setSidebarOpen(isSidebarOpen)
     }
 }

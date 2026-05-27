@@ -9,9 +9,12 @@ import AppKit
 
 final class NSSidebarView: NSView {
 
+    static let standardWidth: CGFloat = 220
+
     init() {
         super.init(frame: .zero)
         wantsLayer = true
+        layer?.masksToBounds = true
         translatesAutoresizingMaskIntoConstraints = false
     }
 
@@ -25,7 +28,7 @@ final class NSSidebarView: NSView {
         addSubview(view)
         NSLayoutConstraint.activate([
             view.leadingAnchor.constraint(equalTo: leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: trailingAnchor),
+            view.widthAnchor.constraint(equalToConstant: Self.standardWidth),
             view.topAnchor.constraint(equalTo: topAnchor),
             view.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])

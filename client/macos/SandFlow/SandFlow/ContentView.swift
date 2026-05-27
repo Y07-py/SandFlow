@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isSidebarOpen = true
+
     var body: some View {
-        RootContainerRepresentable {
-            SidebarView()
+        RootContainerRepresentable(isSidebarOpen: isSidebarOpen) {
+            SidebarView(isSidebarOpen: $isSidebarOpen)
         } mainContent: {
-            MainContentView()
+            MainContentView(isSidebarOpen: $isSidebarOpen)
         }
         .ignoresSafeArea()
     }

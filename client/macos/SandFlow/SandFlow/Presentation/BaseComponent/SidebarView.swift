@@ -9,6 +9,8 @@ import Foundation
 import SwiftUI
 
 struct SidebarView: View {
+    @Binding var isSidebarOpen: Bool
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Sidebar")

@@ -10,6 +10,12 @@ import AppKit
 final class NSMainContentView: NSView {
 
     private let contentBackground = NSView()
+    private var contentLeadingConstraint: NSLayoutConstraint!
+
+    var contentLeadingInset: CGFloat {
+        get { contentLeadingConstraint.constant }
+        set { contentLeadingConstraint.constant = newValue }
+    }
 
     init() {
         super.init(frame: .zero)
@@ -42,8 +48,10 @@ final class NSMainContentView: NSView {
         contentBackground.layer?.masksToBounds = true
         addSubview(contentBackground)
 
+        contentLeadingConstraint = contentBackground.leadingAnchor.constraint(equalTo: leadingAnchor)
+
         NSLayoutConstraint.activate([
-            contentBackground.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentLeadingConstraint,
             contentBackground.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
             contentBackground.topAnchor.constraint(equalTo: topAnchor, constant: 10),
             contentBackground.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
