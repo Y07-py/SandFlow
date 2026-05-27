@@ -1,0 +1,48 @@
+# =========================
+# OS & Environment
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# =========================
+# Client (Xcode / SwiftUI / macOS & iOS)
+# =========================
+# Build artifacts
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# User-specific Xcode files
+xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+.build/
+.swiftpm/
+# ※依存関係のバージョンを固定するため、Package.resolved は除外せずコミットに含めるのが一般的です
+
+# =========================
+# Backend (Rust)
+# =========================
+/backend/target/
+**/*.rs.bk
+
+# =========================
+# Secrets & Environment Variables
+# =========================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
