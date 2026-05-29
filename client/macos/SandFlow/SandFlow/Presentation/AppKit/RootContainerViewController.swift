@@ -10,13 +10,17 @@ import SwiftUI
 
 final class RootContainerViewController: NSViewController {
 
-    private static let backgroundColor = NSColor(
-        srgbRed: 0.1, green: 0.15, blue: 0.2, alpha: 1.0
-    )
+    private static let backgroundColor: NSColor = .clear
     private static let sidebarOpenWidth: CGFloat = NSSidebarView.standardWidth
     private static let sidebarClosedWidth: CGFloat = 0
-    private static let mainContentEdgeInset: CGFloat = 10
+    private static let mainContentEdgeInset: CGFloat = 6
     private static let sidebarAnimationDuration: CFTimeInterval = 0.25
+    
+    private static let sidebarMinimumWidth: CGFloat = NSSidebarView.standardWidth
+    private static let sidebarMaximumWidth: CGFloat = NSSidebarView.maximumWidth
+    
+    private let resizeHandle = SidebarResizeHandle()
+    private var currentSidebarWidth: CGFloat = NSSidebarView.standardWidth
 
     private static let trafficLightLeadingInset: CGFloat = 20
     private static let trafficLightTopInset: CGFloat = 22
@@ -41,12 +45,16 @@ final class RootContainerViewController: NSViewController {
     }
 
     override func loadView() {
-        let container = NSView()
-        container.wantsLayer = true
-        container.layer?.backgroundColor = Self.backgroundColor.cgColor
+        let container = NSVisualEffectView()
+        container.material = .underWindowBackground
+        container.blendingMode = .behindWindow
+        container.state = .active
 
         container.addSubview(sidebarContainer)
         container.addSubview(mainContentContainer)
+        
+        resizeHandle.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(resizeHandle)
 
         sidebarWidthConstraint = sidebarContainer.widthAnchor.constraint(
             equalToConstant: Self.sidebarOpenWidth
@@ -62,10 +70,24 @@ final class RootContainerViewController: NSViewController {
             mainContentContainer.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             mainContentContainer.topAnchor.constraint(equalTo: container.topAnchor),
             mainContentContainer.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            
+            resizeHandle.trailingAnchor.constraint(equalTo: sidebarContainer.trailingAnchor),
+            resizeHandle.topAnchor.constraint(equalTo: sidebarContainer.topAnchor),
+            resizeHandle.bottomAnchor.constraint(equalTo: sidebarContainer.bottomAnchor),
+            resizeHandle.widthAnchor.constraint(equalToConstant: 6),
         ])
 
         sidebarContainer.setContentView(sidebarHostingView)
         mainContentContainer.setContentView(mainContentHostingView)
+        
+        resizeHandle.onDrag = { [weak self] dx in
+            guard let self else { return }
+            let proposedX = self.sidebarWidthConstraint.constant + dx
+            let clampedX = min(max(proposedX, Self.sidebarMinimumWidth), Self.sidebarMaximumWidth)
+            self.sidebarWidthConstraint.constant = clampedX
+            self.currentSidebarWidth = clampedX
+            self.repositionTrafficLights(animated: false)
+        }
 
         self.view = container
     }
@@ -74,6 +96,8 @@ final class RootContainerViewController: NSViewController {
         super.viewDidAppear()
         if let window = view.window {
             window.isMovableByWindowBackground = true
+            window.isOpaque = false
+            window.backgroundColor = .clear
         }
     }
 
@@ -89,14 +113,16 @@ final class RootContainerViewController: NSViewController {
         guard let window = view.window else { return }
         let buttonOrder: [NSWindow.ButtonType] = [.closeButton, .miniaturizeButton, .zoomButton]
         let effectiveWidth = sidebarWidth ?? sidebarWidthConstraint.constant
-        let slideOffset = effectiveWidth - Self.sidebarOpenWidth
+        let slideOffset = min(0, effectiveWidth - Self.sidebarMinimumWidth)
         for (index, type) in buttonOrder.enumerated() {
             guard let button = window.standardWindowButton(type),
                   let titlebar = button.superview,
                   titlebar.bounds.height > 0 else { continue }
+            
             let x = Self.trafficLightLeadingInset + slideOffset + CGFloat(index) * Self.trafficLightSpacing
             let y = titlebar.bounds.height - button.frame.height - Self.trafficLightTopInset
             let target = NSPoint(x: x, y: y)
+            
             if animated {
                 button.animator().setFrameOrigin(target)
             } else {
@@ -106,7 +132,7 @@ final class RootContainerViewController: NSViewController {
     }
 
     func setSidebarOpen(_ isOpen: Bool) {
-        let widthTarget = isOpen ? Self.sidebarOpenWidth : Self.sidebarClosedWidth
+        let widthTarget = isOpen ? currentSidebarWidth : Self.sidebarClosedWidth
         let mainLeadingTarget: CGFloat = isOpen ? 0 : Self.mainContentEdgeInset
         guard sidebarWidthConstraint.constant != widthTarget else { return }
 
@@ -122,9 +148,11 @@ final class RootContainerViewController: NSViewController {
             context.duration = Self.sidebarAnimationDuration
             context.allowsImplicitAnimation = true
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            
             sidebarWidthConstraint.animator().constant = widthTarget
             mainContentContainer.contentLeadingInset = mainLeadingTarget
             repositionTrafficLights(animated: true, sidebarWidth: widthTarget)
+            
             view.layoutSubtreeIfNeeded()
         }, completionHandler: { [weak self] in
             self?.isSidebarAnimating = false

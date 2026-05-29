@@ -9,7 +9,7 @@ import AppKit
 
 final class NSMainContentView: NSView {
 
-    private let contentBackground = NSView()
+    private let contentBackground = NSVisualEffectView()
     private var contentLeadingConstraint: NSLayoutConstraint!
 
     var contentLeadingInset: CGFloat {
@@ -41,9 +41,11 @@ final class NSMainContentView: NSView {
     }
 
     private func setupBackground() {
+        contentBackground.material = .hudWindow
+        contentBackground.blendingMode = .withinWindow
+        contentBackground.state = .active
         contentBackground.wantsLayer = true
         contentBackground.translatesAutoresizingMaskIntoConstraints = false
-        contentBackground.layer?.backgroundColor = NSColor.underPageBackgroundColor.cgColor
         contentBackground.layer?.cornerRadius = 12
         contentBackground.layer?.masksToBounds = true
         addSubview(contentBackground)
@@ -52,14 +54,9 @@ final class NSMainContentView: NSView {
 
         NSLayoutConstraint.activate([
             contentLeadingConstraint,
-            contentBackground.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-            contentBackground.topAnchor.constraint(equalTo: topAnchor, constant: 10),
-            contentBackground.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
+            contentBackground.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -6),
+            contentBackground.topAnchor.constraint(equalTo: topAnchor, constant: 6),
+            contentBackground.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -6),
         ])
-    }
-
-    override func updateLayer() {
-        super.updateLayer()
-        contentBackground.layer?.backgroundColor = NSColor.underPageBackgroundColor.cgColor
     }
 }
