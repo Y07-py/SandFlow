@@ -12,7 +12,7 @@ struct MainContentView: View {
     @Binding var isSidebarOpen: Bool
 
     var body: some View {
-        VStack {
+        VStack(spacing: .zero) {
             headerView
         }
         .frame(maxHeight: .infinity, alignment: .top)

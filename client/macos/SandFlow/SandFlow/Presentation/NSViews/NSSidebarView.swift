@@ -23,15 +23,21 @@ final class NSSidebarView: NSView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setContentView(_ view: NSView) {
+    // The content view keeps a fixed width anchored to the leading edge instead of
+    // tracking the container's trailing edge. 
+    private(set) var contentWidthConstraint: NSLayoutConstraint?
+
+    func setContentView(_ view: NSView, width: CGFloat) {
         subviews.forEach { $0.removeFromSuperview() }
         view.translatesAutoresizingMaskIntoConstraints = false
         addSubview(view)
+        let widthConstraint = view.widthAnchor.constraint(equalToConstant: width)
+        contentWidthConstraint = widthConstraint
         NSLayoutConstraint.activate([
             view.leadingAnchor.constraint(equalTo: leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: trailingAnchor),
             view.topAnchor.constraint(equalTo: topAnchor),
             view.bottomAnchor.constraint(equalTo: bottomAnchor),
+            widthConstraint,
         ])
     }
 }

@@ -7,7 +7,7 @@
 
 import AppKit
 
-final class SidebarResizeHandle: NSView {
+final class NSSidebarResizeHandleView: NSView {
     var onDrag: ((_ deltaX: CGFloat) -> Void)?
     private var lastX: CGFloat = 0
     

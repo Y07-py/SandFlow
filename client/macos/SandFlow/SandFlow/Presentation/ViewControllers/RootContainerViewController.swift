@@ -19,7 +19,7 @@ final class RootContainerViewController: NSViewController {
     private static let sidebarMinimumWidth: CGFloat = NSSidebarView.standardWidth
     private static let sidebarMaximumWidth: CGFloat = NSSidebarView.maximumWidth
     
-    private let resizeHandle = SidebarResizeHandle()
+    private let resizeHandle = NSSidebarResizeHandleView()
     private var currentSidebarWidth: CGFloat = NSSidebarView.standardWidth
 
     private static let trafficLightLeadingInset: CGFloat = 20
@@ -77,14 +77,15 @@ final class RootContainerViewController: NSViewController {
             resizeHandle.widthAnchor.constraint(equalToConstant: 6),
         ])
 
-        sidebarContainer.setContentView(sidebarHostingView)
+        sidebarContainer.setContentView(sidebarHostingView, width: Self.sidebarOpenWidth)
         mainContentContainer.setContentView(mainContentHostingView)
-        
+
         resizeHandle.onDrag = { [weak self] dx in
             guard let self else { return }
             let proposedX = self.sidebarWidthConstraint.constant + dx
             let clampedX = min(max(proposedX, Self.sidebarMinimumWidth), Self.sidebarMaximumWidth)
             self.sidebarWidthConstraint.constant = clampedX
+            self.sidebarContainer.contentWidthConstraint?.constant = clampedX
             self.currentSidebarWidth = clampedX
             self.repositionTrafficLights(animated: false)
         }
