@@ -26,6 +26,7 @@ final class RootContainerViewController: NSViewController {
     private static let trafficLightTopInset: CGFloat = 22
     private static let trafficLightSpacing: CGFloat = 22
 
+    private let gradientBackground = NSGradientBackgroundView()
     private let sidebarContainer = NSSidebarView()
     private let mainContentContainer = NSMainContentView()
     private var sidebarWidthConstraint: NSLayoutConstraint!
@@ -50,6 +51,7 @@ final class RootContainerViewController: NSViewController {
         container.blendingMode = .behindWindow
         container.state = .active
 
+        container.addSubview(gradientBackground)
         container.addSubview(sidebarContainer)
         container.addSubview(mainContentContainer)
         
@@ -61,6 +63,11 @@ final class RootContainerViewController: NSViewController {
         )
 
         NSLayoutConstraint.activate([
+            gradientBackground.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            gradientBackground.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            gradientBackground.topAnchor.constraint(equalTo: container.topAnchor),
+            gradientBackground.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+
             sidebarContainer.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             sidebarContainer.topAnchor.constraint(equalTo: container.topAnchor),
             sidebarContainer.bottomAnchor.constraint(equalTo: container.bottomAnchor),

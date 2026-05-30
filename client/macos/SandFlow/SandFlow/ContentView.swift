@@ -9,12 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var isSidebarOpen = true
+    @State private var selectedSection: SidebarSection = .createTask
 
     var body: some View {
         RootContainerRepresentable(isSidebarOpen: isSidebarOpen) {
-            SidebarView(isSidebarOpen: $isSidebarOpen)
+            SidebarView(isSidebarOpen: $isSidebarOpen, selectedSection: $selectedSection)
         } mainContent: {
-            MainContentView(isSidebarOpen: $isSidebarOpen)
+            MainContentView(isSidebarOpen: $isSidebarOpen, selectedSection: $selectedSection)
         }
         .ignoresSafeArea()
     }

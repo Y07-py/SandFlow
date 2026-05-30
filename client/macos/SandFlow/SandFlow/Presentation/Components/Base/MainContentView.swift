@@ -10,12 +10,24 @@ import SwiftUI
 
 struct MainContentView: View {
     @Binding var isSidebarOpen: Bool
+    @Binding var selectedSection: SidebarSection
 
     var body: some View {
         VStack(spacing: .zero) {
             headerView
+            content
         }
         .frame(maxHeight: .infinity, alignment: .top)
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch selectedSection {
+        case .createTask:
+            CreateTaskView()
+        case .tasks:
+            TasksView()
+        }
     }
 
     @ViewBuilder
